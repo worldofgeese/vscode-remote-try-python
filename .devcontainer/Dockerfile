@@ -6,7 +6,7 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 # [Optional] Allow the vscode user to pip install globally w/o sudo
 ENV PIP_TARGET=/usr/local/pip-global
 ENV PYTHONPATH=${PIP_TARGET}:${PYTHONPATH}
-ENV PATH=${PIP_TARGET}/bin:${PATH}
+ENV PATH=${PIP_TARGET}/bin:/home/vscode/.garden/bin:${PATH}
 
 ARG USERNAME=vscode
 
@@ -16,15 +16,14 @@ RUN if ! cat /etc/group | grep -e "^pip-global:" > /dev/null 2>&1; then groupadd
     && chown :pip-global ${PIP_TARGET} \
     && ( [ ! -f "/etc/profile.d/00-restore-env.sh" ] || sed -i -e "s/export PATH=/export PATH=\/usr\/local\/pip-global:/" /etc/profile.d/00-restore-env.sh )
 
-# Install kubectl
-RUN curl -sSL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
-    && chmod +x /usr/local/bin/kubectl
-
 # Script copies localhost's ~/.kube/config file into the container and swaps out 
 # localhost for host.docker.internal on bash/zsh start to keep them in sync.
 COPY copy-kube-config.sh /usr/local/share/
 RUN chown ${USERNAME}:root /usr/local/share/copy-kube-config.sh \
     && echo "source /usr/local/share/copy-kube-config.sh" | tee -a /root/.bashrc /root/.zshrc /home/${USERNAME}/.bashrc >> /home/${USERNAME}/.zshrc
+
+# Install Garden
+RUN su vscode -c "curl -sL https://get.garden.io/install.sh | bash"
 
 # [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
 ARG NODE_VERSION="none"

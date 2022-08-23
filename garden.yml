@@ -1,0 +1,20 @@
+kind: Module
+type: container
+name: vscode-remote-try-python
+dockerfile: Dockerfile
+services:
+  - name: frontend
+    devMode:
+      command: [flask, --app, /app/app/app.py, --debug, run, --host=0.0.0.0]
+      sync:
+        - source: app
+          target: /app
+          mode: one-way-replica
+    ports: 
+      - name: http
+        containerPort: 5000
+    ingresses:
+      - port: http
+tests:
+  - name: unit
+    args: [pytest]
