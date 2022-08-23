@@ -1,0 +1,12 @@
+kind: Project
+name: vscode-remote-try-python
+environments:
+  - name: remote
+providers:
+  - name: kubernetes
+    context: gke_devrel-348008_europe-north1_gke-autopilot-north1-demo-1
+    defaultHostname: vscode-remote-try-python.devrel.demo.garden
+    setupIngressController: false
+    deploymentRegistry:
+      hostname: "docker.io"
+      namespace: "worldofgeese"
