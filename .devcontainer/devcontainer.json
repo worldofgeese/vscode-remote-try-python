@@ -15,6 +15,14 @@
 		}
 	},
 
+	"remoteEnv": {
+		"SYNC_LOCALHOST_KUBECONFIG": "true"
+	},
+
+	"mounts": [
+        "source=${localEnv:HOME}/.kube,target=/usr/local/share/kube-localhost,type=bind"
+	],
+
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -55,6 +63,10 @@
 	"remoteUser": "vscode",
 	"features": {
 		"docker-from-docker": "latest",
-		"kubectl-helm-minikube": "latest"
+        "kubectl-helm-minikube": {
+            "version": "latest",
+            "helm": "latest",
+            "minikube": "none"
+        },
 	}
 }
