@@ -16,18 +16,8 @@ RUN if ! cat /etc/group | grep -e "^pip-global:" > /dev/null 2>&1; then groupadd
     && chown :pip-global ${PIP_TARGET} \
     && ( [ ! -f "/etc/profile.d/00-restore-env.sh" ] || sed -i -e "s/export PATH=/export PATH=\/usr\/local\/pip-global:/" /etc/profile.d/00-restore-env.sh )
 
-# Script copies localhost's ~/.kube/config file into the container and swaps out 
-# localhost for host.docker.internal on bash/zsh start to keep them in sync.
-COPY copy-kube-config.sh /usr/local/share/
-RUN chown ${USERNAME}:root /usr/local/share/copy-kube-config.sh \
-    && echo "source /usr/local/share/copy-kube-config.sh" | tee -a /root/.bashrc /root/.zshrc /home/${USERNAME}/.bashrc >> /home/${USERNAME}/.zshrc
-
 # Install Garden
 RUN su vscode -c "curl -sL https://get.garden.io/install.sh | bash"
-
-# [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
-ARG NODE_VERSION="none"
-RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 # COPY requirements.txt /tmp/pip-tmp/

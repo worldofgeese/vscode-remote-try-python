@@ -1,20 +1,38 @@
 kind: Module
+name: origin
+description: Origin container
+build:
+  targetImage: builder
 type: container
-name: vscode-remote-try-python
-dockerfile: Dockerfile
+include:
+  - Dockerfile
+  - app
+  - setup.py
+  - requirements.txt
+    
+---
+
+kind: Module
+name: destination
+description: Destination container
+type: container
+include:
+  - Dockerfile
+  - app
+  - setup.py
+  - requirements.txt
+build:
+  dependencies:
+    - name: origin
+      copy:
+        # A target can be specified here if desired. The default is a directory or
+        # file of the same name.
+        - source: "app.py"
 services:
   - name: frontend
-    devMode:
-      command: [flask, --app, /app/app/app.py, --debug, run, --host=0.0.0.0]
-      sync:
-        - source: app
-          target: /app
-          mode: one-way-replica
-    ports: 
+    ports:
       - name: http
         containerPort: 5000
     ingresses:
       - port: http
-tests:
-  - name: unit
-    args: [pytest]
+    
